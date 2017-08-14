@@ -43,7 +43,7 @@ images more efficiently.
 %package devel
 Summary:       Development files for libwebp, a library for the WebP format
 Requires:      %{name}%{?_isa} = %{version}-%{release}
-Conflicts:     %{real_name}-devel%{?_isa} = %{version}-%{release}
+Conflicts:     %{real_name}-devel%{?_isa}
 
 %description devel
 WebP is an image format that does lossy compression of digital

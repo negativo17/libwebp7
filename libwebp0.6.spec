@@ -3,23 +3,24 @@
 
 Name:          %{real_name}0.6
 Version:       0.6.0
-Release:       1%{?dist}
+Release:       2%{?dist}
 URL:           http://webmproject.org/
 Summary:       Library and tools for the WebP graphics format
 # Additional IPR is licensed as well. See PATENTS file for details
 License:       BSD
 Source0:       http://downloads.webmproject.org/releases/webp/%{real_name}-%{version}.tar.gz
-Source1:       libwebp_jni_example.java
 
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: freeglut-devel
+BuildRequires: giflib-devel
 BuildRequires: libjpeg-devel
 BuildRequires: libpng-devel
-BuildRequires: giflib-devel
 BuildRequires: libtiff-devel
-BuildRequires: java-devel
-BuildRequires: jpackage-utils
-BuildRequires: swig
-BuildRequires: autoconf automake libtool
-BuildRequires: freeglut-devel
+BuildRequires: libtool
+
+Obsoletes:     %{name}-java < %{version}-%{release}
+Provides:      %{name}-java == %{version}-%{release}
 
 %description
 WebP is an image format that does lossy compression of digital
@@ -53,16 +54,6 @@ developers can use WebP to compress, archive and distribute digital
 images more efficiently.
 
 
-%package java
-Summary:       Java bindings for libwebp, a library for the WebP format
-Requires:      %{name}%{?_isa} = %{version}-%{release}
-Requires:      java-headless
-Requires:      jpackage-utils
-
-%description java
-Java bindings for libwebp.
-
-
 %prep
 %autosetup -n %{real_name}-%{version}
 
@@ -79,45 +70,16 @@ export CFLAGS="%{optflags} -frename-registers"
            --disable-neon
 %make_build V=1
 
-# swig generated Java bindings
-cp %{SOURCE1} .
-cd swig
-rm -rf libwebp.jar libwebp_java_wrap.c
-mkdir -p java/com/google/webp
-swig -ignoremissing -I../src -java \
-    -package com.google.webp  \
-    -outdir java/com/google/webp \
-    -o libwebp_java_wrap.c libwebp.swig
-
-gcc %{optflags} -shared \
-    -I/usr/lib/jvm/java/include \
-    -I/usr/lib/jvm/java/include/linux \
-    -I../src \
-    -L../src/.libs -lwebp libwebp_java_wrap.c \
-    -o libwebp_jni.so
-
-cd java
-javac com/google/webp/libwebp.java
-jar cvf ../libwebp.jar com/google/webp/*.class
-
 
 %install
 %make_install
-find "%{buildroot}/%{_libdir}" -type f -name "*.la" -delete
+find "%{buildroot}/%{_libdir}" -name "*.la" -delete
 
-# swig generated Java bindings
-mkdir -p %{buildroot}/%{_libdir}/%{real_name}-java
-cp swig/*.jar swig/*.so %{buildroot}/%{_libdir}/%{real_name}-java/
-
-
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
-
+%{?ldconfig_scriptlets}
 
 %files
-%doc README PATENTS NEWS AUTHORS
 %license COPYING
+%doc README PATENTS NEWS AUTHORS
 %{_libdir}/libwebp.so.7*
 %{_libdir}/libwebpdecoder.so.3*
 %{_libdir}/libwebpdemux.so.2*
@@ -137,12 +99,11 @@ cp swig/*.jar swig/*.so %{buildroot}/%{_libdir}/%{real_name}-java/
 %{_includedir}/*
 %{_libdir}/pkgconfig/*
 
-%files java
-%doc libwebp_jni_example.java
-%{_libdir}/%{real_name}-java/
-
 
 %changelog
+* Fri Mar 11 2022 Simone Caronni <negativo17@gmail.com> - 0.6.0-2
+- Drop java bindings, update SPEC file.
+
 * Mon Aug 14 2017 Simone Caronni <negativo17@gmail.com> - 0.6.0-1
 - Update to 0.6.0.
 - Rename to libwebp0.6 for RHEL 7 compatibility.

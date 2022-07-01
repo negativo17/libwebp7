@@ -1,9 +1,9 @@
 %global _hardened_build 1
 %global real_name libwebp
 
-Name:          %{real_name}0.6
-Version:       0.6.0
-Release:       2%{?dist}
+Name:          %{real_name}7
+Version:       0.6.1
+Release:       1%{?dist}
 URL:           http://webmproject.org/
 Summary:       Library and tools for the WebP graphics format
 # Additional IPR is licensed as well. See PATENTS file for details
@@ -21,6 +21,8 @@ BuildRequires: libtool
 
 Obsoletes:     %{name}-java < %{version}-%{release}
 Provides:      %{name}-java == %{version}-%{release}
+Obsoletes:     %{real_name}0.6 < %{version}-%{release}
+Provides:      %{real_name}0.6 == %{version}-%{release}
 
 %description
 WebP is an image format that does lossy compression of digital
@@ -29,9 +31,10 @@ container based on RIFF. Webmasters, web developers and browser
 developers can use WebP to compress, archive and distribute digital
 images more efficiently.
 
-
 %package tools
 Summary:       The WebP command line tools
+Obsoletes:     %{real_name}0.6-tools < %{version}-%{release}
+Provides:      %{real_name}0.6-tools == %{version}-%{release}
 
 %description tools
 WebP is an image format that does lossy compression of digital
@@ -40,11 +43,12 @@ container based on RIFF. Webmasters, web developers and browser
 developers can use WebP to compress, archive and distribute digital
 images more efficiently.
 
-
 %package devel
 Summary:       Development files for libwebp, a library for the WebP format
 Requires:      %{name}%{?_isa} = %{version}-%{release}
 Conflicts:     %{real_name}-devel%{?_isa}
+Obsoletes:     %{real_name}0.6-devel < %{version}-%{release}
+Provides:      %{real_name}0.6-devel == %{version}-%{release}
 
 %description devel
 WebP is an image format that does lossy compression of digital
@@ -53,10 +57,8 @@ container based on RIFF. Webmasters, web developers and browser
 developers can use WebP to compress, archive and distribute digital
 images more efficiently.
 
-
 %prep
 %autosetup -n %{real_name}-%{version}
-
 
 %build
 autoreconf -vif
@@ -69,7 +71,6 @@ export CFLAGS="%{optflags} -frename-registers"
            --enable-libwebpdemux --enable-libwebpdecoder \
            --disable-neon
 %make_build V=1
-
 
 %install
 %make_install
@@ -91,6 +92,7 @@ find "%{buildroot}/%{_libdir}" -name "*.la" -delete
 %{_bindir}/gif2webp
 %{_bindir}/img2webp
 %{_bindir}/webpmux
+%{_bindir}/webpinfo
 %{_bindir}/vwebp
 %{_mandir}/man*/*
 
@@ -101,6 +103,10 @@ find "%{buildroot}/%{_libdir}" -name "*.la" -delete
 
 
 %changelog
+* Fri Jul 01 2022 Simone Caronni <negativo17@gmail.com> - 0.6.1-1
+- Update to 0.6.1.
+- Rename to libwebp7.
+
 * Fri Mar 11 2022 Simone Caronni <negativo17@gmail.com> - 0.6.0-2
 - Drop java bindings, update SPEC file.
 
